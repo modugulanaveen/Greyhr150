@@ -654,7 +654,13 @@ Never put the Supabase service-role key in frontend variables or committed files
 
 ### Deployment
 
-A Vercel SPA rewrite is included in `vercel.json`. The backend can be deployed to a Node.js hosting platform with `npm run build` and `npm run start` from the API workspace. Configure `WEB_ORIGIN`, HTTPS, Supabase Auth redirect URLs and all production environment variables in the hosting platform.
+A Vercel SPA rewrite is included in `vercel.json`. For Render, use the repository root with this build command:
+
+```sh
+npm ci --include=dev && npm run build --workspace=@paymate/api
+```
+
+Use `npm run start --workspace=@paymate/api` as the start command. The build needs the API workspace's TypeScript compiler and Express/Node type packages, which are development dependencies; `--include=dev` keeps them available even when Render sets `NODE_ENV=production`. Configure `WEB_ORIGIN`, HTTPS, Supabase Auth redirect URLs and all production environment variables in the hosting platform.
 
 See:
 
