@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/server.ts",
+    "prebuild": "npm run build --workspace=@paymate/shared",
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc --noEmit",
     "start": "node dist/server.js"
