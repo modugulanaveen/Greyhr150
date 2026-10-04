@@ -11,7 +11,7 @@ export function requiredEnv(name: string): string {
 export const config = {
   nodeEnv: process.env.NODE_ENV === 'production' ? 'production' : 'development',
   port: Number(process.env.PORT || 4000),
-  webOrigins: (process.env.WEB_ORIGIN || 'http://localhost:5173').split(',').map(v => v.trim()).filter(Boolean),
+  webOrigins: (process.env.WEB_ORIGIN || (isProduction ? '' : 'http://localhost:5173')).split(',').map(v => v.trim()).filter(Boolean),
   appVersion: process.env.APP_VERSION || '1.8.0',
   maxJsonBody: process.env.MAX_JSON_BODY || '100kb',
   rateLimitWindowMs: Number(process.env.RATE_LIMIT_WINDOW_MS || 60_000),
@@ -20,8 +20,9 @@ export const config = {
 
 export function validateProductionConfig() {
   if (config.nodeEnv !== 'production') return;
-  const required = ['SUPABASE_URL', 'SUPABASE_ANON_KEY', 'SUPABASE_SERVICE_ROLE_KEY'];
-  const missing = required.filter(name => !process.env[name]);
-  if (!missing.length && !config.webOrigins.length) return;
-  throw new Error('Required production configuration is missing');
+  const required = ['SUPABASE_URL', 'SUPABASE_ANON_KEY', 'SUPABASE_SERVICE_ROLE_KEY', 'WEB_ORIGIN'];
+  const missing = required.filter(name => !process.env[name]?.trim());
+  if (missing.length) {
+    throw new Error(`Required production configuration is missing: ${missing.join(', ')}`);
+  }
 }

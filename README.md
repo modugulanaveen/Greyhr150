@@ -660,7 +660,7 @@ A Vercel SPA rewrite is included in `vercel.json`. For Render, use the repositor
 npm ci --include=dev && npm run build --workspace=@paymate/api
 ```
 
-Use `npm run start --workspace=@paymate/api` as the start command. The build needs the API workspace's TypeScript compiler and Express/Node type packages, which are development dependencies; `--include=dev` keeps them available even when Render sets `NODE_ENV=production`. Configure `WEB_ORIGIN`, HTTPS, Supabase Auth redirect URLs and all production environment variables in the hosting platform.
+Use `npm run start --workspace=@paymate/api` as the start command. The build needs the API workspace's TypeScript compiler and Express/Node type packages, which are development dependencies; `--include=dev` keeps them available even when Render sets `NODE_ENV=production`. In the API service's hosting environment, set `NODE_ENV=production`, `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, and `WEB_ORIGIN` (the exact HTTPS origin of the deployed frontend, such as `https://app.example.com`). The API exits at startup and lists any missing required production variables. Also configure HTTPS and Supabase Auth redirect URLs in the hosting platform and Supabase dashboard.
 
 See:
 
