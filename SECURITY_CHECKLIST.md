@@ -1,0 +1,26 @@
+# PayMate Security Checklist
+
+- [ ] Supabase Auth validates every API bearer token
+- [ ] Tenant membership is resolved server-side
+- [ ] `company_id`, `employee_id` and `payroll_run_id` are never trusted from the browser without membership/ownership checks
+- [ ] Deactivated/suspended memberships are denied
+- [ ] RLS is enabled on company-owned tables
+- [ ] Company membership RLS only exposes active/invited membership to the member itself
+- [ ] Sensitive Storage buckets are private
+- [ ] Sensitive files are delivered with short-lived signed URLs
+- [ ] Upload size, MIME and file-signature validation is enabled
+- [ ] Request body limits are configured
+- [ ] Query pagination/search values are bounded
+- [ ] API rate limiting is enabled
+- [ ] Production CORS is allow-listed
+- [ ] Helmet/security headers are enabled
+- [ ] Service-role key exists only on backend infrastructure
+- [ ] Passwords are managed by Supabase Auth
+- [ ] Audit logs are append-only
+- [ ] Payroll approval/locking requires explicit role permission
+- [ ] Locked payroll cannot be recalculated or have attendance modified
+- [ ] Reports consume stored payroll snapshots
+- [ ] Sensitive PAN/UAN/bank values are masked where appropriate
+- [ ] Errors returned to users are sanitized
+- [ ] No secrets or demo production data are committed
+- [ ] External backup/PITR and Storage recovery configuration is verified

@@ -1,0 +1,18 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+const root=path.resolve(process.cwd()); const read=p=>fs.readFileSync(path.join(root,p),'utf8');
+test('payslip migration is additive and tenant isolated',()=>{const s=read('supabase/migrations/202609300007_phase7_payslips.sql');for(const t of ['payslip_settings','payslips'])assert.match(s,new RegExp(`create table public\\.${t}`));assert.match(s,/enable row level security/g);assert.match(s,/unique\(payroll_record_id, version\)/);assert.doesNotMatch(s,/create table public\.employees/);});
+test('private payslip storage buckets are created',()=>{const s=read('supabase/migrations/202609300007_phase7_payslips.sql');assert.match(s,/values\('payslips','payslips',false\)/);assert.match(s,/values\('payslip-branding','payslip-branding',false\)/);});
+test('payslip generation requires approved or locked payroll',()=>{const s=read('apps/api/src/routes/payslips.ts');assert.match(s,/\['APPROVED','LOCKED'\]\.includes\(run\.status\)/);assert.match(s,/Payslips can be generated after payroll is approved/);});
+test('payslip generation allows accountant role from the permission matrix',()=>{const s=read('apps/api/src/routes/payslips.ts');assert.match(s,/\['OWNER','COMPANY_ADMIN','HR','ACCOUNTANT'\]\.includes\(m\.role\)/);});
+test('payslip uses payroll snapshot and does not recalculate salary',()=>{const s=read('apps/api/src/routes/payslips.ts');assert.match(s,/payroll_records/);assert.match(s,/adjusted_gross/);assert.match(s,/snapshot/);assert.doesNotMatch(s,/calculateSalaryStructure/);assert.doesNotMatch(s,/calculateMonthlyPayrollPreview/);});
+test('payslip filename is employee and period based',()=>{const s=read('apps/api/src/routes/payslips.ts');assert.match(s,/PAYSLIP_\$\{safeFile\(employeeId\)\}_\$\{run\.payroll_year\}-\$\{String\(run\.payroll_month\)/);});
+test('private signed download and company validation exist',()=>{const s=read('apps/api/src/routes/payslips.ts');assert.match(s,/createSignedUrl/);assert.match(s,/eq\('company_id',companyId\)/);assert.match(s,/authorize\(req,companyId\)/);});
+test('bulk generation is bounded and controlled',()=>{const s=read('apps/api/src/routes/payslips.ts');assert.match(s,/max\(500\)/);assert.match(s,/for\(const id of ids\)/);assert.match(s,/PAYSLIPS_/);});
+test('versioned regeneration is preserved',()=>{const s=read('apps/api/src/routes/payslips.ts');assert.match(s,/Number\(existing\.version\)\+1/);assert.match(s,/PAYSLIP_REGENERATED/);assert.match(s,/version/);});
+test('audit actions cover generation and download',()=>{const s=read('apps/api/src/routes/payslips.ts');for(const a of ['PAYSLIP_GENERATED','PAYSLIP_REGENERATED','PAYSLIP_DOWNLOADED'])assert.match(s,new RegExp(a));});
+test('web routes and navigation are enabled',()=>{const app=read('apps/web/src/App.tsx');for(const p of ['/payslips','/payslips/:payslipId','/payslips/settings'])assert.match(app,new RegExp(p.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')));const l=read('apps/web/src/components/Layout.tsx');assert.match(l,/path: '\/payslips', label: 'Payslips', icon: FileText, enabled: true/);});
+test('PDF generation uses a real A4 PDF document',()=>{const s=read('apps/api/src/routes/payslips.ts');assert.match(s,/new PDFDocument\(\{size:'A4'/);assert.match(s,/doc\.end\(\)/);});
+test('payslip settings restrict logo file types and size',()=>{const s=read('apps/api/src/routes/payslips.ts');assert.match(s,/fileSize:2\*1024\*1024/);assert.match(s,/image\/png/);assert.match(s,/image\/jpeg/);assert.match(s,/image\/webp/);});

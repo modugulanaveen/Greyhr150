@@ -1,0 +1,8 @@
+export type ComplianceStatus='PENDING'|'PREPARED'|'FILED'|'PAID'|'PARTIALLY_PAID'|'NOT_APPLICABLE'|'OVERDUE'|'OUTDATED';
+export interface PfSnapshotRow { employeeId:string; employeeName:string; uan:string|null; pfEligible:boolean; pfWage:number; employeePf:number; employerPf:number; eps:number; edli:number; }
+export interface PaymentSummary { amount:number; paidAmount:number; balance:number; status:ComplianceStatus; }
+export function roundComplianceAmount(v:number){return Math.round((Number(v)||0)+Number.EPSILON);}
+export function paymentStatus(amount:number,paid:number,dueDate?:string|null,today=new Date()){const a=roundComplianceAmount(amount),p=roundComplianceAmount(paid),b=Math.max(0,a-p);if(a===0)return 'NOT_APPLICABLE' as const;if(b===0)return 'PAID' as const;if(p>0)return 'PARTIALLY_PAID' as const;if(dueDate&&new Date(`${dueDate}T23:59:59`) < today)return 'OVERDUE' as const;return 'PENDING' as const;}
+export function validateUan(uan:string|null|undefined){return !!uan&&/^\d{12}$/.test(uan);}
+export function validateEcrRows(rows:PfSnapshotRow[]){const errors:string[]=[];const seen=new Set<string>();for(const r of rows){if(!r.pfEligible)continue;if(!validateUan(r.uan))errors.push(`${r.employeeId}: missing or invalid UAN`);if(seen.has(r.uan!))errors.push(`${r.employeeId}: duplicate UAN ${r.uan}`);if(r.uan)seen.add(r.uan);if(r.pfWage<0||r.employeePf<0||r.employerPf<0)errors.push(`${r.employeeId}: invalid PF amount`);}return errors;}
+export function formatEcrRows(rows:PfSnapshotRow[]){return rows.filter(r=>r.pfEligible).map(r=>[r.uan??'',r.employeeName,r.pfWage,r.employeePf,r.employerPf,r.eps,r.edli].map(v=>String(v??'')).join('#')).join('\n');}

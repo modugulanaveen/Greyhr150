@@ -1,0 +1,35 @@
+{
+  "name": "@paymate/api",
+  "private": true,
+  "version": "1.8.0",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc --noEmit",
+    "start": "node dist/server.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.49.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "helmet": "^8.0.0",
+    "zod": "^3.24.1",
+    "multer": "^1.4.5-lts.1",
+    "xlsx": "^0.18.5",
+    "@paymate/shared": "1.8.0",
+    "pdfkit": "^0.16.0",
+    "archiver": "^7.0.1"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/node": "^22.10.7",
+    "tsx": "^4.19.2",
+    "typescript": "~5.7.3",
+    "@types/multer": "^1.4.12",
+    "@types/pdfkit": "^0.13.5",
+    "@types/archiver": "^6.0.3"
+  }
+}
