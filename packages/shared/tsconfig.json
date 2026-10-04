@@ -1,1 +1,1 @@
-{"compilerOptions":{"target":"ES2022","module":"ESNext","moduleResolution":"Bundler","strict":true,"declaration":true,"outDir":"dist","skipLibCheck":true,"rewriteRelativeImportExtensions":true},"include":["src"]}
+{"compilerOptions":{"target":"ES2022","module":"ESNext","moduleResolution":"Bundler","strict":true,"declaration":true,"rootDir":"src","outDir":"dist","skipLibCheck":true,"rewriteRelativeImportExtensions":true},"include":["src"]}
